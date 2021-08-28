@@ -12,3 +12,5 @@ TODO:
 - [ ] Dash
 [Cat]
 - [ ] High jump
+
+- [ ] Glide down as filbert, fast fall as Chad
