@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlatformerMovement : MonoBehaviour
 {
-
-
     #region Variables
     private Rigidbody2D rigibody;
     private readonly KeyCode JUMP_KEY = KeyCode.Space;
@@ -19,66 +17,40 @@ public class PlatformerMovement : MonoBehaviour
     public float groundCheckRadius = 0.25f;
     public LayerMask groundLayer;
 
-    enum CHAR_STATE { CHAD, FILBERT }
+    public enum CHAR_STATE { CHAD, FILBERT }
     private CHAR_STATE charState;
-    private PlayerInfo chadInfo;
-    private PlayerInfo filbertInfo;
 
-    private PlayerInfo activePlayerInfo {
+    public GameObject chad;
+    public GameObject filbert;
+
+    private PlayerState chadState;
+    private PlayerState filbertState;
+
+
+    private PlayerState activePlayerState {
         get
         {
             if (charState == CHAR_STATE.CHAD)
-                return chadInfo;
-            return filbertInfo;
+                return chadState;
+            return filbertState;
         }
     }
-    private float lateralSpeedMultiplier => activePlayerInfo.lateralSpeedMultipiler;
-    private float fallMultiplier => activePlayerInfo.fallMultiplier;
-    private float lowJumpMultiplier => activePlayerInfo.lowJumpMultiplier;
-    private float jumpMultiplier => activePlayerInfo.jumpMultiplier;
-
-
-    [Header("Chad Info")]
-    public float chadLateralSpeedMultiplier = 3.0f;
-    public float chadFallMultiplier = 2.5f;
-    public float chadLowJumpMultiplier = 2.0f;
-    public float chadJumpMultiplier = 3.0f;
-
-    [Header("Filbert Info")]
-    public float filbertLateralSpeedMultiplier = 3.0f;
-    public float filbertFallMultiplier = 2.5f;
-    public float filbertLowJumpMultiplier = 2.0f;
-    public float filbertJumpMultiplier = 3.0f;
-
-    // DEBUG
-    private SpriteRenderer sprite;
-
-    private Vector2 nextMovement;
+    private float lateralSpeedMultiplier => activePlayerState.lateralSpeedMultipiler;
+    private float fallMultiplier => activePlayerState.fallMultiplier;
+    private float lowJumpMultiplier => activePlayerState.lowJumpMultiplier;
+    private float jumpMultiplier => activePlayerState.jumpMultiplier;
+    private float dashDistance => activePlayerState.dashDistance;
 
     #endregion
-
-    private void OnValidate()
-    {
-        chadInfo = new PlayerInfo();
-        chadInfo.lateralSpeedMultipiler = chadLateralSpeedMultiplier;
-        chadInfo.fallMultiplier = chadFallMultiplier;
-        chadInfo.lowJumpMultiplier = chadLowJumpMultiplier;
-        chadInfo.jumpMultiplier = chadJumpMultiplier;
-
-        filbertInfo = new PlayerInfo();
-        filbertInfo.lateralSpeedMultipiler = filbertLateralSpeedMultiplier;
-        filbertInfo.fallMultiplier = filbertFallMultiplier;
-        filbertInfo.lowJumpMultiplier = filbertLowJumpMultiplier;
-        filbertInfo.jumpMultiplier = filbertJumpMultiplier;
-    }
-
 
     // Start is called before the first frame update
     void Start()
     {
         rigibody = GetComponent<Rigidbody2D>();
-        sprite = GetComponent<SpriteRenderer>();
+        // spriteRenderer = GetComponent<SpriteRenderer>();
 
+        chadState = chad.GetComponent<PlayerState>();
+        filbertState = filbert.GetComponent<PlayerState>();
 
         SwapToChad();
     }
@@ -90,8 +62,10 @@ public class PlatformerMovement : MonoBehaviour
             Swap();
         ApplyVerticalForce();
         ApplyHorizontalForce();
+
         CheckIfGrounded();
     }
+
 
     private void ApplyVerticalForce ()
     {
@@ -112,10 +86,25 @@ public class PlatformerMovement : MonoBehaviour
         float xInput = GetLateralMovement();
         float xVel = xInput * lateralSpeedMultiplier;
         if (!isDashing)
+        {
             rigibody.velocity = new Vector2(xVel, rigibody.velocity.y);
+            UpdateRotation(xVel);
+        }
 
         if (AllowDash())
-            StartCoroutine(Dash());
+            StartCoroutine(Dash(xInput));
+    }
+    private void UpdateRotation (float xVel)
+    {
+        float yRotation = transform.rotation.eulerAngles.y;
+        if (xVel > 0)
+            yRotation = 0;
+        else if (xVel < 0)
+            yRotation = 180;
+
+        float x = transform.rotation.eulerAngles.x;
+        float z = transform.rotation.eulerAngles.z;
+        transform.rotation = Quaternion.Euler(x, yRotation, z);
     }
 
     private Vector2 GetLowJumpForce ()
@@ -134,17 +123,19 @@ public class PlatformerMovement : MonoBehaviour
         else
             SwapToChad();
     }
-
-    private void SwapToFilbert()
-    {
-        charState = CHAR_STATE.FILBERT;
-        sprite.color = Color.yellow;
-    }
     
     private void SwapToChad ()
     {
         charState = CHAR_STATE.CHAD;
-        sprite.color = Color.green;
+        chad.SetActive(true);
+        filbert.SetActive(false);
+    }
+
+    private void SwapToFilbert()
+    {
+        charState = CHAR_STATE.FILBERT;
+        filbert.SetActive(true);
+        chad.SetActive(false);
     }
 
     private bool InputIsSwap()
@@ -179,15 +170,19 @@ public class PlatformerMovement : MonoBehaviour
         return x;
     }
 
-    IEnumerator Dash ()
+    IEnumerator Dash (float xDir)
     {
-        Debug.Log("Dash");
         isDashing = true;
         rigibody.velocity = new Vector2(rigibody.velocity.x, 0.0f);
-        float dashDistance = 15.0f;
-        float direction = GetLateralMovement();
-        rigibody.AddForce(new Vector2(dashDistance * direction, 0.0f), ForceMode2D.Impulse);
+        rigibody.AddForce(new Vector2(dashDistance * xDir, 0.0f), ForceMode2D.Impulse);
+
+        // cache the current gravityScale
+        float gravityScale = rigibody.gravityScale;
+        rigibody.gravityScale = 0.0f;
+
         yield return new WaitForSeconds(0.3f);
+
         isDashing = false;
+        rigibody.gravityScale = gravityScale;
     }
 }
