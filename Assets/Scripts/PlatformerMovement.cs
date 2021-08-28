@@ -25,8 +25,6 @@ public class PlatformerMovement : MonoBehaviour
 
     private PlayerState chadState;
     private PlayerState filbertState;
-
-
     private PlayerState activePlayerState {
         get
         {
@@ -35,12 +33,24 @@ public class PlatformerMovement : MonoBehaviour
             return filbertState;
         }
     }
+
+    private Animator chadAnimator;
+    private Animator filbertAnimator;
+    private Animator animator
+    {
+        get
+        {
+            if (charState == CHAR_STATE.CHAD)
+                return chadAnimator;
+            return filbertAnimator;
+        }
+    }
+
     private float lateralSpeedMultiplier => activePlayerState.lateralSpeedMultipiler;
     private float fallMultiplier => activePlayerState.fallMultiplier;
     private float lowJumpMultiplier => activePlayerState.lowJumpMultiplier;
     private float jumpMultiplier => activePlayerState.jumpMultiplier;
     private float dashDistance => activePlayerState.dashDistance;
-
     #endregion
 
     // Start is called before the first frame update
@@ -50,7 +60,10 @@ public class PlatformerMovement : MonoBehaviour
         // spriteRenderer = GetComponent<SpriteRenderer>();
 
         chadState = chad.GetComponent<PlayerState>();
+        chadAnimator = chad.GetComponent<Animator>();
+
         filbertState = filbert.GetComponent<PlayerState>();
+        filbertAnimator = filbert.GetComponent<Animator>();
 
         SwapToChad();
     }
@@ -87,8 +100,10 @@ public class PlatformerMovement : MonoBehaviour
         float xVel = xInput * lateralSpeedMultiplier;
         if (!isDashing)
         {
+            UpdateAnimator(xInput);
+            UpdateRotation(xInput);
+
             rigibody.velocity = new Vector2(xVel, rigibody.velocity.y);
-            UpdateRotation(xVel);
         }
 
         if (AllowDash())
@@ -105,6 +120,11 @@ public class PlatformerMovement : MonoBehaviour
         float x = transform.rotation.eulerAngles.x;
         float z = transform.rotation.eulerAngles.z;
         transform.rotation = Quaternion.Euler(x, yRotation, z);
+    }
+
+    private void UpdateAnimator (float xVel)
+    {
+        animator.SetFloat("Speed", Mathf.Abs(xVel));
     }
 
     private Vector2 GetLowJumpForce ()
