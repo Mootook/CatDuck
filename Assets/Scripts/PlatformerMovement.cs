@@ -13,7 +13,8 @@ public class PlatformerMovement : MonoBehaviour
     private readonly KeyCode DASH_KEY = KeyCode.E;
 
 
-    public bool isGrounded;
+    private bool isDashing;
+    private bool isGrounded;
     public Transform isGroundedCheck;
     public float groundCheckRadius = 0.25f;
     public LayerMask groundLayer;
@@ -52,6 +53,8 @@ public class PlatformerMovement : MonoBehaviour
     // DEBUG
     private SpriteRenderer sprite;
 
+    private Vector2 nextMovement;
+
     #endregion
 
     private void OnValidate()
@@ -83,33 +86,37 @@ public class PlatformerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        float xInput = GetLateralMovement();
-        float xVel = xInput * lateralSpeedMultiplier;
-
-        ApplyVerticalForce();
-
-
         if (InputIsSwap())
             Swap();
-
-        // apply in fixedUpdate?
-        rigibody.velocity = new Vector2(xVel, rigibody.velocity.y);
-
+        ApplyVerticalForce();
+        ApplyHorizontalForce();
         CheckIfGrounded();
     }
 
     private void ApplyVerticalForce ()
     {
-        if (rigibody.velocity.y < 0)
-            rigibody.velocity += GetModifiedGravityForce();
-        else if (rigibody.velocity.y > 0 && !Input.GetKey(JUMP_KEY))
-            rigibody.velocity += GetLowJumpForce();
+        if (!isDashing)
+        {
+            if (rigibody.velocity.y < 0)
+                rigibody.velocity += GetModifiedGravityForce();
+            else if (rigibody.velocity.y > 0 && !Input.GetKey(JUMP_KEY))
+                rigibody.velocity += GetLowJumpForce();
 
-        if (AllowJump())
-            rigibody.velocity = Vector2.up * jumpMultiplier;
+            if (AllowJump())
+                rigibody.velocity = Vector2.up * jumpMultiplier;
+        }
     }
+    private void ApplyHorizontalForce ()
+    {
 
+        float xInput = GetLateralMovement();
+        float xVel = xInput * lateralSpeedMultiplier;
+        if (!isDashing)
+            rigibody.velocity = new Vector2(xVel, rigibody.velocity.y);
+
+        if (AllowDash())
+            StartCoroutine(Dash());
+    }
 
     private Vector2 GetLowJumpForce ()
     {
@@ -145,6 +152,11 @@ public class PlatformerMovement : MonoBehaviour
         return Input.GetKeyDown(SWAP_KEY);
     }
 
+    private bool AllowDash ()
+    {
+        return Input.GetKeyDown(DASH_KEY);
+    }
+
     private bool AllowJump ()
     {
         return Input.GetKeyDown(JUMP_KEY) && isGrounded;
@@ -165,5 +177,17 @@ public class PlatformerMovement : MonoBehaviour
     {
         float x = Input.GetAxisRaw("Horizontal");
         return x;
+    }
+
+    IEnumerator Dash ()
+    {
+        Debug.Log("Dash");
+        isDashing = true;
+        rigibody.velocity = new Vector2(rigibody.velocity.x, 0.0f);
+        float dashDistance = 15.0f;
+        float direction = GetLateralMovement();
+        rigibody.AddForce(new Vector2(dashDistance * direction, 0.0f), ForceMode2D.Impulse);
+        yield return new WaitForSeconds(0.3f);
+        isDashing = false;
     }
 }
