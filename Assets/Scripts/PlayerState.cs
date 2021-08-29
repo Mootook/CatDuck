@@ -10,5 +10,10 @@ public class PlayerState : MonoBehaviour
     public float dashDistance;
 
     public GameObject companion;
+
+    [Header("Audio")]
+    public AudioClip walkingSound;
+    public AudioClip jumpSound;
+    public AudioClip dashSound;
 }
 

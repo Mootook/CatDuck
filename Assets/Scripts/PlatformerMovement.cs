@@ -10,7 +10,11 @@ public class PlatformerMovement : MonoBehaviour
     private readonly KeyCode SWAP_KEY = KeyCode.Q;
     private readonly KeyCode DASH_KEY = KeyCode.E;
 
+    private AudioSource audioSource;
+    public AudioClip highFive;
 
+    private bool hasUsedAirborneDash = false;
+    private bool isFacingRight = true;
     private bool isDashing;
     private bool isGrounded;
     public Transform isGroundedCheck;
@@ -22,6 +26,7 @@ public class PlatformerMovement : MonoBehaviour
 
     public GameObject chad;
     public GameObject filbert;
+    public GameObject highFiveGameObject;
 
     private PlayerState chadState;
     private PlayerState filbertState;
@@ -52,26 +57,27 @@ public class PlatformerMovement : MonoBehaviour
     private float jumpMultiplier => activePlayerState.jumpMultiplier;
     private float dashDistance => activePlayerState.dashDistance;
 
-    private bool hasUsedAirborneDash = false;
-    private bool isFacingRight = true;
+    private AudioClip walkingSound => activePlayerState.walkingSound;
+    private AudioClip jumpSound => activePlayerState.jumpSound;
+    private AudioClip dashSound => activePlayerState.dashSound;
     #endregion
 
-    // Start is called before the first frame update
+    #region Lifecycle
     void Start()
     {
         rigibody = GetComponent<Rigidbody2D>();
-        // spriteRenderer = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
 
         chadState = chad.GetComponent<PlayerState>();
         chadAnimator = chad.GetComponent<Animator>();
 
         filbertState = filbert.GetComponent<PlayerState>();
         filbertAnimator = filbert.GetComponent<Animator>();
- 
+
+        highFiveGameObject.SetActive(false);
         SwapToChad();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (InputIsSwap())
@@ -81,6 +87,7 @@ public class PlatformerMovement : MonoBehaviour
 
         CheckIfGrounded();
     }
+    #endregion
 
 
     private void ApplyVerticalForce ()
@@ -93,7 +100,11 @@ public class PlatformerMovement : MonoBehaviour
                 rigibody.velocity += GetLowJumpForce();
 
             if (AllowJump())
+            {
+                if (!PauseMenu.GameIsPaused)
+                    audioSource.PlayOneShot(jumpSound);
                 rigibody.velocity = Vector2.up * jumpMultiplier;
+            }
 
             animator.SetFloat("VerticalVelocity", rigibody.velocity.y);
         }
@@ -105,8 +116,11 @@ public class PlatformerMovement : MonoBehaviour
         float xVel = xInput * lateralSpeedMultiplier;
         if (!isDashing)
         {
-            UpdateAnimator(xInput);
-            UpdateFaceDirection(xInput);
+            if (!PauseMenu.GameIsPaused)
+            {
+                UpdateAnimator(xInput);
+                UpdateFaceDirection(xInput);
+            }
 
             rigibody.velocity = new Vector2(xVel, rigibody.velocity.y);
         }
@@ -120,17 +134,6 @@ public class PlatformerMovement : MonoBehaviour
             Flip();
         else if (xVel < 0 && isFacingRight)
             Flip();
-
-        return;
-        float yRotation = transform.rotation.eulerAngles.y;
-        if (xVel > 0)
-            yRotation = 0;
-        else if (xVel < 0)
-            yRotation = 180;
-
-        float x = transform.rotation.eulerAngles.x;
-        float z = transform.rotation.eulerAngles.z;
-        transform.rotation = Quaternion.Euler(x, yRotation, z);
     }
 
     private void Flip ()
@@ -172,6 +175,15 @@ public class PlatformerMovement : MonoBehaviour
             SwapToFilbert();
         else
             SwapToChad();
+
+        if (!PauseMenu.GameIsPaused)
+            PlayHighFive();
+    }
+
+    private void PlayHighFive ()
+    {
+        audioSource.PlayOneShot(highFive);
+        highFiveGameObject.SetActive(true);
     }
     
     private void SwapToChad ()
@@ -230,6 +242,9 @@ public class PlatformerMovement : MonoBehaviour
         rigibody.velocity = new Vector2(rigibody.velocity.x, 0.0f);
         rigibody.AddForce(new Vector2(dashDistance * xDir, 0.0f), ForceMode2D.Impulse);
 
+        if (!PauseMenu.GameIsPaused)
+            audioSource.PlayOneShot(dashSound);
+
         // cache the current gravityScale
         float gravityScale = rigibody.gravityScale;
         rigibody.gravityScale = 0.0f;
@@ -243,5 +258,11 @@ public class PlatformerMovement : MonoBehaviour
         // guard against infinite dashing
         if (!isGrounded)
             hasUsedAirborneDash = true;
+    }
+
+    // move this
+    public void HighFiveDidComplete ()
+    {
+        Debug.Log("HIGH FIVED");
     }
 }
