@@ -28,7 +28,7 @@ public class PlatformerMovement : MonoBehaviour
     private PlayerState activePlayerState {
         get
         {
-            if (charState == CHAR_STATE.CHAD)
+            if (isChad())
                 return chadState;
             return filbertState;
         }
@@ -40,7 +40,7 @@ public class PlatformerMovement : MonoBehaviour
     {
         get
         {
-            if (charState == CHAR_STATE.CHAD)
+            if (isChad())
                 return chadAnimator;
             return filbertAnimator;
         }
@@ -53,6 +53,7 @@ public class PlatformerMovement : MonoBehaviour
     private float dashDistance => activePlayerState.dashDistance;
 
     private bool hasUsedAirborneDash = false;
+    private bool isFacingRight = true;
     #endregion
 
     // Start is called before the first frame update
@@ -93,6 +94,8 @@ public class PlatformerMovement : MonoBehaviour
 
             if (AllowJump())
                 rigibody.velocity = Vector2.up * jumpMultiplier;
+
+            animator.SetFloat("VerticalVelocity", rigibody.velocity.y);
         }
     }
     private void ApplyHorizontalForce ()
@@ -103,7 +106,7 @@ public class PlatformerMovement : MonoBehaviour
         if (!isDashing)
         {
             UpdateAnimator(xInput);
-            UpdateRotation(xInput);
+            UpdateFaceDirection(xInput);
 
             rigibody.velocity = new Vector2(xVel, rigibody.velocity.y);
         }
@@ -111,8 +114,14 @@ public class PlatformerMovement : MonoBehaviour
         if (AllowDash() && Mathf.Abs(xInput) > 0)
             StartCoroutine(Dash(xInput));
     }
-    private void UpdateRotation (float xVel)
+    private void UpdateFaceDirection (float xVel)
     {
+        if (xVel > 0 && !isFacingRight)
+            Flip();
+        else if (xVel < 0 && isFacingRight)
+            Flip();
+
+        return;
         float yRotation = transform.rotation.eulerAngles.y;
         if (xVel > 0)
             yRotation = 0;
@@ -122,6 +131,15 @@ public class PlatformerMovement : MonoBehaviour
         float x = transform.rotation.eulerAngles.x;
         float z = transform.rotation.eulerAngles.z;
         transform.rotation = Quaternion.Euler(x, yRotation, z);
+    }
+
+    private void Flip ()
+    {
+        isFacingRight = !isFacingRight;
+
+        Vector3 localScale = transform.localScale;
+        localScale.x *= -1;
+        transform.localScale = localScale;
     }
 
     private void UpdateAnimator (float xVel)
@@ -138,9 +156,19 @@ public class PlatformerMovement : MonoBehaviour
         return Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
     }
 
+    public bool isChad ()
+    {
+        return charState == CHAR_STATE.CHAD;
+    }
+
+    public bool isFilbert()
+    {
+        return charState == CHAR_STATE.FILBERT;
+    }
+
     private void Swap ()
     {
-        if (charState == CHAR_STATE.CHAD)
+        if (isChad())
             SwapToFilbert();
         else
             SwapToChad();
@@ -198,6 +226,7 @@ public class PlatformerMovement : MonoBehaviour
     IEnumerator Dash (float xDir)
     {
         isDashing = true;
+        animator.SetBool("isDashing", true);
         rigibody.velocity = new Vector2(rigibody.velocity.x, 0.0f);
         rigibody.AddForce(new Vector2(dashDistance * xDir, 0.0f), ForceMode2D.Impulse);
 
@@ -208,7 +237,10 @@ public class PlatformerMovement : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
 
         isDashing = false;
+        animator.SetBool("isDashing", false);
         rigibody.gravityScale = gravityScale;
+
+        // guard against infinite dashing
         if (!isGrounded)
             hasUsedAirborneDash = true;
     }

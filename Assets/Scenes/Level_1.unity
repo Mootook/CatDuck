@@ -214,6 +214,7 @@ GameObject:
   - component: {fileID: 446539045}
   - component: {fileID: 446539047}
   - component: {fileID: 446539046}
+  - component: {fileID: 446539048}
   m_Layer: 0
   m_Name: Water
   m_TagString: Untagged
@@ -229,7 +230,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 446539044}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 143.22, y: -3.42, z: 23.958406}
+  m_LocalPosition: {x: 143.22, y: -3.44, z: 23.958406}
   m_LocalScale: {x: 14.46875, y: 4.7616, z: 1}
   m_Children: []
   m_Father: {fileID: 1862532917}
@@ -312,6 +313,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &446539048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446539044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 534a1bd5017bc2e4db1020fd1283df7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &531132527
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -646,7 +659,7 @@ Camera:
   far clip plane: 5000
   field of view: 60
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -670,7 +683,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1137686442}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 98.62577, y: 7.3599997, z: -10}
+  m_LocalPosition: {x: -4.6441503, y: -0.050000638, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -868,11 +881,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 940566751294198825, guid: fb4573e8d8e3c8b4da9f7aa4c2d92491, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 95.66
+      value: -7
       objectReference: {fileID: 0}
     - target: {fileID: 940566751294198825, guid: fb4573e8d8e3c8b4da9f7aa4c2d92491, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.76
+      value: -0.47
       objectReference: {fileID: 0}
     - target: {fileID: 940566751294198825, guid: fb4573e8d8e3c8b4da9f7aa4c2d92491, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1046,11 +1059,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 320208677984282682, guid: 23fa4c54e675bb747ba02594f251b1bb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 98.62577
+      value: -4.6441503
       objectReference: {fileID: 0}
     - target: {fileID: 320208677984282682, guid: 23fa4c54e675bb747ba02594f251b1bb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.3599997
+      value: -0.050000638
       objectReference: {fileID: 0}
     - target: {fileID: 320208677984282682, guid: 23fa4c54e675bb747ba02594f251b1bb, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1090,7 +1103,7 @@ PrefabInstance:
       objectReference: {fileID: 348042302}
     - target: {fileID: 320208677984282683, guid: 23fa4c54e675bb747ba02594f251b1bb, type: 3}
       propertyPath: m_Lens.OrthographicSize
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 320208678583593648, guid: 23fa4c54e675bb747ba02594f251b1bb, type: 3}
       propertyPath: m_BiasX

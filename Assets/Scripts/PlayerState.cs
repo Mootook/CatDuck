@@ -8,5 +8,7 @@ public class PlayerState : MonoBehaviour
     public float lowJumpMultiplier;
     public float jumpMultiplier;
     public float dashDistance;
+
+    public GameObject companion;
 }
 
