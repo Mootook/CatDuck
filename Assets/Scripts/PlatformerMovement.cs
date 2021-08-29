@@ -51,6 +51,8 @@ public class PlatformerMovement : MonoBehaviour
     private float lowJumpMultiplier => activePlayerState.lowJumpMultiplier;
     private float jumpMultiplier => activePlayerState.jumpMultiplier;
     private float dashDistance => activePlayerState.dashDistance;
+
+    private bool hasUsedAirborneDash = false;
     #endregion
 
     // Start is called before the first frame update
@@ -64,7 +66,7 @@ public class PlatformerMovement : MonoBehaviour
 
         filbertState = filbert.GetComponent<PlayerState>();
         filbertAnimator = filbert.GetComponent<Animator>();
-
+ 
         SwapToChad();
     }
 
@@ -106,7 +108,7 @@ public class PlatformerMovement : MonoBehaviour
             rigibody.velocity = new Vector2(xVel, rigibody.velocity.y);
         }
 
-        if (AllowDash())
+        if (AllowDash() && Mathf.Abs(xInput) > 0)
             StartCoroutine(Dash(xInput));
     }
     private void UpdateRotation (float xVel)
@@ -165,7 +167,7 @@ public class PlatformerMovement : MonoBehaviour
 
     private bool AllowDash ()
     {
-        return Input.GetKeyDown(DASH_KEY);
+        return Input.GetKeyDown(DASH_KEY) && !hasUsedAirborneDash;
     }
 
     private bool AllowJump ()
@@ -178,7 +180,10 @@ public class PlatformerMovement : MonoBehaviour
 
         Collider2D collider = Physics2D.OverlapCircle(isGroundedCheck.position, groundCheckRadius, groundLayer);
         if (collider != null)
+        {
             isGrounded = true;
+            hasUsedAirborneDash = false;
+        }
         else
             isGrounded = false;
 
@@ -204,5 +209,7 @@ public class PlatformerMovement : MonoBehaviour
 
         isDashing = false;
         rigibody.gravityScale = gravityScale;
+        if (!isGrounded)
+            hasUsedAirborneDash = true;
     }
 }

@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lateralSpeedMultipiler: 3
-  fallMultiplier: 1
+  fallMultiplier: 0.25
   lowJumpMultiplier: 1
   jumpMultiplier: 3
   dashDistance: 10
