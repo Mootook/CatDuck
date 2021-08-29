@@ -9,6 +9,15 @@ EditorBuildSettings:
     path: Assets/Scenes/StartMenu.unity
     guid: 218a4f5ef86deae49a52a0b1c367ed3f
   - enabled: 1
+    path: Assets/Scenes/Intro_Cinematic.unity
+    guid: 05efe8259d011504d9a9e5edfc83804e
+  - enabled: 1
     path: Assets/Scenes/Level_1.unity
     guid: 630359871486ebe48a5b07aa5ff51892
+  - enabled: 1
+    path: Assets/Scenes/Level_2.unity
+    guid: baad0cd514ed42948abbccc5110cb11a
+  - enabled: 1
+    path: Assets/Scenes/Outro_Cinematic.unity
+    guid: 70f4b7872fd97c6429f7ec0fa600627f
   m_configObjects: {}
