@@ -613,7 +613,7 @@ MonoBehaviour:
   fiveBg: {fileID: 21300000, guid: dc59876f4eb542c4e8bfc956aa7d24fd, type: 3}
   sixBg: {fileID: 21300000, guid: 40c1cf134c9dcbe429b2b7527d88628d, type: 3}
   sevenBg: {fileID: 21300000, guid: 1f460b7734d9a8d4dbda5c9d9cfd30d8, type: 3}
-  creditsBg: {fileID: 21300000, guid: 6e14fbc2b2e5ae446b2de83e1ccb8712, type: 3}
+  creditsBg: {fileID: 21300000, guid: a9c283f5bf7dfd34dbc3dc64af7c847f, type: 3}
   dialoguePanel: {fileID: 1607437116}
   dialogueText: {fileID: 40917903}
   avatar: {fileID: 812010515}

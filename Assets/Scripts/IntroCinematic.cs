@@ -23,6 +23,8 @@ public class IntroCinematic : MonoBehaviour
     public Sprite sixBreakdown;
     public Sprite sevenLetsGo;
 
+    public Sprite twoHoursLater;
+
     [Header("Dialogue")]
     public Image dialoguePanel;
     public TextMeshProUGUI dialogueText;
@@ -192,14 +194,15 @@ public class IntroCinematic : MonoBehaviour
         SetDialogueBox(orangeDialogueBox);
         SetDialogueText("Woot! Imma shimmer the heck out of that ball!");
         yield return new WaitForSeconds(DEFAULT_DIALOGUE_TIME_S);
-
+        HideDialogueBox();
+        SetBackgroundImage(twoHoursLater);
+        yield return new WaitForSeconds(DEFAULT_DIALOGUE_TIME_S);
         StartCoroutine(StartFive());
     }
 
     private IEnumerator StartFive ()
     {
         SetBackgroundImage(fiveSoldout);
-        HideDialogueBox();
         yield return new WaitForSeconds(2.0f);
         ShowDialogueBox();
         // EXCEPTION
